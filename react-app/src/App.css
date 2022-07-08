@@ -5,6 +5,9 @@ a {
   text-decoration: none;
   color: #333;
 }
+a:hover {
+  color: #999;
+}
 .App {
   width: 80%;
   margin: 0 auto; 
