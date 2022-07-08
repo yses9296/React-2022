@@ -1,0 +1,13 @@
+body {
+  background-color: bisque;
+}
+.App {
+  width: 80%;
+  margin: 0 auto; 
+}
+.App p {
+  color: #fff;
+  font-size: 3em;
+  text-shadow: 3px 2px 2px #000;
+  text-align: center;
+}
