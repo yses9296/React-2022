@@ -53,6 +53,24 @@ function Article(props){
   )
 }
 
+function Create(props){
+  return (
+    <article>
+      <h2>Create</h2>
+      <form onSubmit={ e => {
+        e.preventDefault();
+        const title = e.target.title.value;
+        const desc = e.target.desc.value;
+        props.onCreate(title, desc);
+      }}>
+        <p><input type="text" name="title" placeholder='Title'></input></p>
+        <p><textarea name="desc" placeholder='Description'></textarea></p>  
+        <p><input type="submit" value="create"></input></p>
+      </form>
+    </article>
+  )
+}
+
 
 // main app
 function App() {
@@ -63,12 +81,13 @@ function App() {
   const [mode, setMode] = useState('WELCOME'); //init
   const [id, setId] = useState(null);
   let content = null;
+  const [nextId, setNextId] = useState(4); //id init
 
-  const topics = [
+  const [topics, setTopics] = useState([
     { id: 1, title: 'HTML', desc: 'HTML is ....' },
     { id: 2, title: 'CSS', desc: 'CSS is ....' },
     { id: 3, title: 'Javascript', desc: 'Javascript is ....' }
-  ];
+  ]);
 
   if(mode === 'WELCOME'){
     content = <Article title="Welcome" desc="Hello, WEB"></Article>
@@ -82,6 +101,18 @@ function App() {
       }
     }
     content = <Article title={title} desc={desc}></Article>
+  }
+  else if( mode === 'CREATE'){
+    content = <Create onCreate={ (_title, _desc) => {
+      const newTopic = {id: nextId, title: _title, desc: _desc};
+      const newToptics = [...topics]; //clone
+      newToptics.push(newTopic);
+      setTopics(newToptics);
+
+      setMode('READ');
+      setId(nextId);
+      setNextId(nextId+1)
+    } }></Create>
   }
 
   return (
@@ -105,6 +136,9 @@ function App() {
       {/* <Article title="Welcome" desc="Hello, WEB"></Article> */}
       {content}
       
+      <a href="/create" onClick={(e) => {
+        e.preventDefault(); 
+        setMode('CREATE')}}>Create</a>
     </div>
   );
 }
