@@ -72,6 +72,31 @@ function Create(props){
 }
 
 
+function Update(props){
+  const [title, setTitle] = useState(props.title);
+  const [desc, setDesc] = useState(props.desc);
+  return (
+    <article>
+    <h2>Update</h2>
+    <form onSubmit={ e => {
+      e.preventDefault();
+      const title = e.target.title.value;
+      const desc = e.target.desc.value;
+      props.onUpdate(title, desc);
+    }}>
+      <p><input type="text" name="title" placeholder='Title' 
+          value={title} onChange={ (e) => {setTitle(e.target.value)}}></input>
+      </p>
+      <p><textarea name="desc" placeholder='Description' 
+          value={desc} onChange={ (e) => {setDesc(e.target.value)}}></textarea>
+      </p>  
+      <p><input type="submit" value="Update"></input></p>
+    </form>
+  </article>
+  )
+}
+
+
 // main app
 function App() {
 
@@ -81,6 +106,7 @@ function App() {
   const [mode, setMode] = useState('WELCOME'); //init
   const [id, setId] = useState(null);
   let content = null;
+  let contextControl = null;
   const [nextId, setNextId] = useState(4); //id init
 
   const [topics, setTopics] = useState([
@@ -101,6 +127,9 @@ function App() {
       }
     }
     content = <Article title={title} desc={desc}></Article>
+    contextControl = <li><a href={'/update/'+id} 
+                            onClick={ e => {e.preventDefault(); setMode('UPDATE')}}>
+                      Update</a></li>
   }
   else if( mode === 'CREATE'){
     content = <Create onCreate={ (_title, _desc) => {
@@ -111,8 +140,31 @@ function App() {
 
       setMode('READ');
       setId(nextId);
-      setNextId(nextId+1)
+      setNextId(nextId+1);
     } }></Create>
+  }
+  else if (mode === 'UPDATE'){
+    let _title, _desc = null; //init
+    for (let i = 0; i< topics.length; i++){
+      if(topics[i].id === id){
+        _title = topics[i].title;
+        _desc = topics[i].desc;
+      }
+    }
+    content = <Update title={_title} desc={_desc} 
+                      onUpdate={ (_title, _desc) => {
+                        const updatedTopic = {id: id, title: _title, desc: _desc};
+                        const newToptics = [...topics]; //clone
+                        for(let i = 0; i< newToptics.length; i++){
+                          if(newToptics[i].id === id){
+                            newToptics[i] = updatedTopic; //paste the updatedTopic array into original one.
+                            break; //stop the loop
+                          }
+                        }
+                        setTopics(newToptics);
+
+                        setMode('READ');
+              }}></Update>
   }
 
   return (
@@ -136,9 +188,14 @@ function App() {
       {/* <Article title="Welcome" desc="Hello, WEB"></Article> */}
       {content}
       
-      <a href="/create" onClick={(e) => {
-        e.preventDefault(); 
-        setMode('CREATE')}}>Create</a>
+      <ul>
+        <li>
+          <a href="/create" onClick={(e) => {
+            e.preventDefault(); 
+            setMode('CREATE')}}>Create</a>
+        </li>
+        {contextControl}
+      </ul>
     </div>
   );
 }
